@@ -11,13 +11,41 @@ self.addEventListener('install', event  =>{
 
         setTimeout(()=>  {
             console.log('SW: Activo y listo para controllar la app');
-            self.skipWaitinng();
+            self.skipWaiting();
             resolve();
-        }, 1000);
+        }, 1);
     });
 
     event.waitUntil(instalacion);
 
     //Borrar cahe viejo
 });
+
+
+// Cuando el SW toma el control de la aplicación
+self.addEventListener('activate', event => {
+
+    // Borrar cache viejo
+
+    console.log('SW2: Activo y listo para controlar la app');
+
+
+});
+
+// FETCH: Manejo de peticiones HTTP
+self.addEventListener('fetch', event => {
+
+    // Aplicar estrategias del cache
+    console.log( 'SW:', event.request.url );
+
+    if ( event.request.url.includes('https://reqres.in/') ) {
+
+             const resp = new Response(`{ ok: false, mensaje: 'jajaja'}`);
+    
+             event.respondWith( resp );
+    }     
+
+});
+
+
     
