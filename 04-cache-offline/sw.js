@@ -1,7 +1,7 @@
 const CACHE_NAME = 'cache-1';
 const CACHE_STATIC_NAME = 'static-v2';
 const CACHE_DYNAMIC_NAME = 'dynamic-v1';
-
+const CACHE_DYNAMIC_LIMIT = 50;
 const CACHE_INMUTABLE_NAME = 'inmutable-v1';
 
 function limpiarCache( cacheName, numeroItems ) {
@@ -35,26 +35,40 @@ self.addEventListener('install', e => {
 
 });
 self.addEventListener('fetch', e => {
+ // 3- Network with cache fallback
+ const respuesta = fetch( e.request ).then( res => {
+    if( !res ) return caches.match( e.request );
 
-// 2- Cache with Network Fallback
-const respuesta = caches.match( e.request )
-.then( res => {
-    if( res ) return res;
-
-    console.log('No existe', e.request.url);
-
-    fetch( e.request ).then( newResp => {
-        caches.open(CACHE_DYNAMIC_NAME).then( cache => {
-            cache.put(e.request, newResp);
-            limpiarCache( CACHE_DYNAMIC_NAME, 5);
-        });
-
-        return newResp.clone();
+    console.log('Fetch', res);
+    caches.open( CACHE_DYNAMIC_NAME ).then( cache => {
+        cache.put( e.request, res );
+        limpiarCache( CACHE_DYNAMIC_NAME, CACHE_DYNAMIC_LIMIT);
     });
+
+    return res.clone();
+}).catch( err => {
+    return caches.match( e.request );
 });
 
-
 e.respondWith(respuesta);
+// 2- Cache with Network Fallback
+// const respuesta = caches.match( e.request )
+//     .then( res => {
+//         if( res ) return res;
+
+//         console.log('No existe', e.request.url);
+
+//         fetch( e.request ).then( newResp => {
+//             caches.open(CACHE_DYNAMIC_NAME).then( cache => {
+//                 cache.put(e.request, newResp);
+//                 limpiarCache( CACHE_DYNAMIC_NAME, CACHE_DYNAMIC_LIMIT);
+//             });
+
+//             return newResp.clone();
+//         });
+//     });
+
+// e.respondWith(respuesta);
 
 // 1- Cache Only
 // e.respondWith( caches.match( e.request ) );
