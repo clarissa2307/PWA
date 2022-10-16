@@ -1,6 +1,9 @@
+const CACHE_NAME = 'cache-1';
+
 self.addEventListener('install', e => {
 
-    const cacheProm = caches.open('cache-1').then( cache => {
+    
+        const cacheProm = caches.open(CACHE_NAME).then( cache => {
 
         return cache.addAll([
             '/',
@@ -17,5 +20,25 @@ self.addEventListener('install', e => {
 });
 self.addEventListener('fetch', e => {
 
-    e.respondWith( caches.match( e.request ) );
+// 2- Cache with Network Fallback
+const respuesta = caches.match( e.request )
+.then( res => {
+    if( res ) return res;
+
+    console.log('No existe', e.request.url);
+
+    fetch( e.request ).then( newResp => {
+        caches.open(CACHE_NAME).then( cache => {
+            cache.put(e.request, newResp);
+        });
+
+        return newResp.clone();
+    });
+});
+
+
+e.respondWith(respuesta);
+
+// 1- Cache Only
+// e.respondWith( caches.match( e.request ) );
 });
