@@ -1,9 +1,11 @@
 const CACHE_NAME = 'cache-1';
+const CACHE_STATIC_NAME  = 'static-v1';
+const CACHE_DYNAMIC_NAME = 'dynamic-v1';
+
+const CACHE_INMUTABLE_NAME = 'inmutable-v1';
 
 self.addEventListener('install', e => {
-
-    
-        const cacheProm = caches.open(CACHE_NAME).then( cache => {
+    const cacheProm = caches.open(CACHE_STATIC_NAME).then( cache => {
 
         return cache.addAll([
             '/',
@@ -16,7 +18,11 @@ self.addEventListener('install', e => {
 
     });
 
-    e.waitUntil(cacheProm);
+    const cacheInmutable = caches.open( CACHE_INMUTABLE_NAME)
+        .then( cache => cache.add('https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css'));
+
+    e.waitUntil(Promise.all([cacheProm, cacheInmutable]));
+
 });
 self.addEventListener('fetch', e => {
 
@@ -28,7 +34,7 @@ const respuesta = caches.match( e.request )
     console.log('No existe', e.request.url);
 
     fetch( e.request ).then( newResp => {
-        caches.open(CACHE_NAME).then( cache => {
+        caches.open(CACHE_DYNAMIC_NAME).then( cache => {
             cache.put(e.request, newResp);
         });
 
