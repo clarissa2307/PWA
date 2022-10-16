@@ -35,22 +35,32 @@ self.addEventListener('install', e => {
 
 });
 self.addEventListener('fetch', e => {
- // 3- Network with cache fallback
- const respuesta = fetch( e.request ).then( res => {
-    if( !res ) return caches.match( e.request );
+    // 4- Cache with networks update
+    if(e.request.url.includes('bootstrap')) {
+        return e.respondWith(caches.match(e.request));
+    }
 
-    console.log('Fetch', res);
-    caches.open( CACHE_DYNAMIC_NAME ).then( cache => {
-        cache.put( e.request, res );
-        limpiarCache( CACHE_DYNAMIC_NAME, CACHE_DYNAMIC_LIMIT);
+    const respuesta = caches.open( CACHE_STATIC_NAME ).then( cache => {
+        fetch(e.request).then( newRes => cache.put(e.request,newRes));
+
+        return cache.match(e.request);
     });
+ // 3- Network with cache fallback
+    // const respuesta = fetch( e.request ).then( res => {
+    //     if( !res ) return caches.match( e.request );
 
-    return res.clone();
-}).catch( err => {
-    return caches.match( e.request );
-});
+    //     console.log('Fetch', res);
+    //     caches.open( CACHE_DYNAMIC_NAME ).then( cache => {
+    //         cache.put( e.request, res );
+    //         limpiarCache( CACHE_DYNAMIC_NAME, CACHE_DYNAMIC_LIMIT);
+    //     });
 
-e.respondWith(respuesta);
+    //     return res.clone();
+    // }).catch( err => {
+    //     return caches.match( e.request );
+    // });
+
+    // e.respondWith(respuesta);
 // 2- Cache with Network Fallback
 // const respuesta = caches.match( e.request )
 //     .then( res => {
