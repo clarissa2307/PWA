@@ -112,5 +112,21 @@ self.addEventListener( 'fetch', e => {
 
     e.respondWith( respuesta );
 });
+// tareas asíncronas
+self.addEventListener('sync', e => {
+
+    console.log('SW: Sync');
+
+    if ( e.tag === 'nuevo-post' ) {
+
+        // postear a BD cuando hay conexión
+       // const respuesta = postearMensajes();
+        
+        //e.waitUntil( respuesta );
+    }
+
+
+
+});
 
 
