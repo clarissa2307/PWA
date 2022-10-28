@@ -20,6 +20,14 @@ const mensajes = [
 
 // Get mensajes
 router.get('/', function (req, res) {
+  // res.json('Obteniendo mensajes');
+  res.json( mensajes );
+});
+
+
+// Post mensaje
+router.post('/', function (req, res) {
+  
   const mensaje = {
     mensaje: req.body.mensaje,
     user: req.body.user

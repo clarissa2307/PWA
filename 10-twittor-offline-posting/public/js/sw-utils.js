@@ -41,21 +41,39 @@ function actualizaCacheStatico( staticCache, req, APP_SHELL_INMUTABLE ) {
 }
 // Network with cache fallback / update
 function manejoApiMensajes( cacheName, req ) {
+    
+    if ( req.clone().method === 'POST' ) {
+        // POSTEO de un nuevo mensaje
 
-    return fetch( req ).then( res => {
+        if ( self.registration.sync ) {
+            return req.clone().text().then( body =>{
     
-        if ( res.ok ) {
-            actualizaCacheDinamico( cacheName, req, res.clone() );
-            return res.clone();
+                // console.log(body);
+                const bodyObj = JSON.parse( body );
+                return guardarMensaje( bodyObj );
+    
+            });
         } else {
-            return caches.match( req );
+            return fetch( req );
         }
-  
-    }).catch( err => {
-        return caches.match( req );
-    });
+
+
+    } else {
+
+        return fetch( req ).then( res => {
     
+            if ( res.ok ) {
+                actualizaCacheDinamico( cacheName, req, res.clone() );
+                return res.clone();
+            } else {
+                return caches.match( req );
+            }
+      
+        }).catch( err => {
+            return caches.match( req );
+        });
+
+    }
 
 
 }
-
