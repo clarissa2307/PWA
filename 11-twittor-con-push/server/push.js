@@ -2,6 +2,14 @@ const fs = require('fs');
 const urlsafeBase64 = require('urlsafe-base64');
 const vapid = require('./vapid.json');
 
+const webpush = require('web-push');
+
+webpush.setVapidDetails(
+    'mailto:jluisvazquez.jv@gmail.com',
+    vapid.publicKey,
+    vapid.privateKey
+);
+
 const suscripciones = require('./subs-db.json');
 
 module.exports.getKey = () => {
@@ -14,3 +22,13 @@ module.exports.addSubscription = (suscripcion) => {
 
     fs.writeFileSync(`${ __dirname }/subs-db.json`, JSON.stringify(suscripciones) );
 };
+
+module.exports.sendPush = (post) => {
+
+    suscripciones.forEach( (suscripcion, i) => {
+
+        webpush.sendNotification( suscripcion , post.titulo );
+
+    });
+
+}
