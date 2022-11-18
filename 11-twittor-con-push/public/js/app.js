@@ -329,7 +329,7 @@ btnDesactivadas.on( 'click', function() {
             body: JSON.stringify( suscripcion )
         })
         .then( verificaSuscripcion )
-        .catch( console.log() );  
+        .catch( cancelarSuscripcion );
 
             
 
