@@ -481,7 +481,21 @@ function mostrarMapaModal(lat, lng) {
 // Obtener la geolocalización
 btnLocation.on('click', () => {
 
-    console.log('Botón geolocalización');
+    //console.log('Botón geolocalización');
+    $.mdtoast('Cargando mapa...', {
+        interaction: true,
+        interactionTimeout: 2000,
+        actionText: 'Ok!'
+    });
+
+    navigator.geolocation.getCurrentPosition( pos => {
+
+        console.log( pos );
+        mostrarMapaModal( pos.coords.latitude, pos.coords.longitude );
+
+       
+
+    });
     
 
 });
